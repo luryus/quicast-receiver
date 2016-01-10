@@ -92,7 +92,6 @@ var SwiftCast = (function(window, document, cast, SomApi) {
 
     return {
         initApp,
-        displayMessage,
         handleCommand,
     };
 
