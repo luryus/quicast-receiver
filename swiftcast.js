@@ -1,9 +1,9 @@
 'use strict';
 
-let SwiftCast = ((window, cast) => {
+var SwiftCast = (function(window, cast) {
 
-    let castReceiverManager;
-    let commandBus;
+    var castReceiverManager;
+    var commandBus;
 
     function initApp() {
         cast.receiver.logger.setLevelValue(0);
