@@ -1,3 +1,5 @@
+'use strict';
+
 let SwiftCast = ((window, cast) => {
 
     let castReceiverManager;
