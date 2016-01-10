@@ -1,18 +1,22 @@
 'use strict';
 
-var SwiftCast = (function(window, cast) {
+var SwiftCast = (function(window, document, cast, SomApi) {
 
     var castReceiverManager;
     var commandBus;
 
+    var Commands = {
+        START_TEST: "start_test",
+    };
+
     function initApp() {
-        cast.receiver.logger.setLevelValue(0);
+        cast.receiver.logger.setLevelValue(cast.receiver.LoggerLevel.DEBUG);
         castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
 
         // handler for 'ready' event
         castReceiverManager.onReady = function(event) {
             console.log('Ready event: ' + event.data);
-            window.castReceiverManager.setApplicationState("Application ready");
+            castReceiverManager.setApplicationState("ready");
         };
 
         // handler for 'senderconnected'
@@ -23,7 +27,7 @@ var SwiftCast = (function(window, cast) {
 
         castReceiverManager.onSenderDisconnected = function(event) {
             console.log('Sender disconnected: ' + event.data);
-            if (window.castReceiverManager.getSenders().length == 0) {
+            if (castReceiverManager.getSenders().length == 0) {
                 // close the receiver app if no senders remain
                 window.close();
             }
@@ -36,23 +40,62 @@ var SwiftCast = (function(window, cast) {
         commandBus.onMessage = function(event) {
             console.log('Message [' + event.senderId + ']: ' + event.data);
             // display the message
-            displayMessage(event.data);
+            handleCommand(event.data);
         };
 
         // init the CastReceiverManager with a status message
         castReceiverManager.start({ statusText: "Application starting "});
         console.log('Receiver Manager started');
+
+        _initSomApi();
     }
 
-    function displayMessage(message) {
-        console.log('Displaying message: ' + message);
-        document.getElementById('message').innerHTML = message;
+    function _initSomApi() {
+        SomApi.account = 'SOM5692bfa86b017';
+        SomApi.domainName = 'luryus.github.io';
+        SomApi.config = {
+            sustainTime: 5,
+            userInfoEnabled: false,
+        };
+        SomApi.onTestCompleted = _onSpeedTestCompleted;
+        SomApi.onError = _onSpeedTestError;
+        SomApi.onProgress = _onSpeedTestProgress;
+    }
+
+    function handleCommand(cmd) {
+        if (cmd === Commands.START_TEST) {
+            SomApi.startTest();
+            castReceiverManager.setApplicationState('testing');
+        }
+    }
+
+    function _onSpeedTestCompleted(testResults) {
+        console.log('Speed test completed', testResults);
+        document.getElementById('results').innerHTML =
+            'Completed: ' + JSON.stringify(testResults);
+        castReceiverManager.setApplicationState('test_completed');
+    }
+
+    function _onSpeedTestError(testError) {
+        console.log('Speed test error', testError);
+        document.getElementById('results').innerHTML =
+            'Error: ' + JSON.stringify(testError);
+        castReceiverManager.setApplicationState('test_error');
+    }
+
+    function _onSpeedTestProgress(testProgress) {
+        console.log('Speed test progress', testProgress);
+        document.getElementById('results').innerHTML =
+            'Progress: ' + JSON.stringify(testProgress);
+        castReceiverManager.setApplicationState('test_progress');
     }
 
     return {
         initApp,
         displayMessage,
+        handleCommand,
     };
-})(window, cast);
+
+})(window, document, cast, SomApi);
 
 window.onload = SwiftCast.initApp;
