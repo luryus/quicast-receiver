@@ -101,7 +101,7 @@ var Quicast = (function(window, document, cast, SomApi) {
     function _initSomApi() {
         SomApi.account = 'SOM5692bfa86b017';
         SomApi.domainName = 'luryus.github.io';
-        SomApi.config.sustainTime = 5;
+        SomApi.config.sustainTime = 3;
         SomApi.config.userInfoEnabled = false;
         SomApi.config.progress.verbose = true;
 
