@@ -102,7 +102,7 @@ var Quicast = (function(window, document, cast, SomApi) {
         SomApi.account = 'SOM5692bfa86b017';
         SomApi.domainName = 'luryus.github.io';
         SomApi.config.sustainTime = 3;
-        SomApi.config.userInfoEnabled = false;
+        SomApi.config.userInfoEnabled = true;
         SomApi.config.progress.verbose = true;
 
         SomApi.onTestCompleted = _onSpeedTestCompleted;
@@ -114,6 +114,14 @@ var Quicast = (function(window, document, cast, SomApi) {
         if (cmd === Commands.START_TEST) {
             _startTesting();
         }
+    }
+
+    function _sendResultsToSender(testResults) {
+        var jsonResults = JSON.stringify(testResults);
+        // send the results to every sender connected to the receiver
+        _castReceiverManager.getSenders().forEach(function(senderId) {
+            _commandBus.send(senderId, jsonResults);
+        });
     }
 
     function _startTesting() {
@@ -152,6 +160,7 @@ var Quicast = (function(window, document, cast, SomApi) {
         testServerDiv.classList.remove('hidden');
 
         _setAppState(ApplicationState.COMPLETED);
+        _sendResultsToSender(testResults);
     }
 
     function _onSpeedTestError(testError) {
