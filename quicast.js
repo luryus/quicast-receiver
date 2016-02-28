@@ -125,6 +125,8 @@ var Quicast = (function(window, document, cast, SomApi) {
     }
 
     function _startTesting() {
+        return;
+
         _testCompleted = false;
         console.log('Now starting testing (cake?)');
         SomApi.startTest();

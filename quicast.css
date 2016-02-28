@@ -1,6 +1,10 @@
 .content-wrapper {
   margin: 8%;
 }
+#obsolete-text {
+  text-align: left;
+  font-size: xx-large;
+}
 div {
   transition: visibility 0s, opacity 0.4s linear;
 }
